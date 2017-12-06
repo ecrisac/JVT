@@ -1,0 +1,23 @@
+﻿<Window x:Class="TimeReport.LogMessage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Log Message" Height="250" Width="350"  WindowStartupLocation="CenterScreen">
+    <Grid Width="600" Margin="5" FocusManager.FocusedElement="{Binding ElementName=UserComment}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="120"/>            
+            <RowDefinition Height="Auto"/>            
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Content="Log message:"  VerticalAlignment="Center" Name="lbl"/>
+        <TextBox Grid.Row="1" MinWidth="300" Height="100" Name="UserComment" MaxLines="10" TextWrapping="Wrap" />
+
+        <StackPanel Grid.Row="2" Margin="0 5 0 0" Orientation="Horizontal" >
+            <Label  Content="Date:"  VerticalAlignment="Center" Name="lblDate" Margin="0 0 2 0"/>
+            <DatePicker  Text="" Name="Picker" Margin="0 0 2 0"></DatePicker>
+            <Button Click="DoLogin" Width="100" Height="25" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsDefault="True">Log time</Button>
+        </StackPanel> 
+    </Grid>
+</Window>

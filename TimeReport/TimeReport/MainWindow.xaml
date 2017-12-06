@@ -1,0 +1,132 @@
+﻿<Window x:Class="TimeReport.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:UI"
+        Title="Jira vs toggl" Height="336" Width="1023" WindowState="Maximized" FocusManager.FocusedElement="{Binding ElementName=SearchBox}">
+    <Grid>
+        <Grid.Resources>
+            <ControlTemplate x:Key="EmptyListBoxTemplate">
+                <ui:ucSpinnerApple HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </ControlTemplate>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style x:Key="CommonStyle" TargetType="{x:Type FrameworkElement}">
+                <Style.Setters>
+                    <Setter Property="Margin" Value="2" />
+                </Style.Setters>
+            </Style>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CommonStyle}" />
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource CommonStyle}" />
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CommonStyle}" />
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource CommonStyle}" />
+        </Grid.Resources>
+
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label>Search :</Label>
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     Text="{Binding SearchText, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                     HorizontalAlignment="Left" MinWidth="250" IsEnabled="{Binding IsLoaded}" Name="SearchBox" />
+            <Label Grid.Row="0" Grid.Column="2">Jira server :</Label>
+            <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding Jiras}" SelectedItem="{Binding SelectedJira}"
+                      MinWidth="250" />
+            <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal">
+                <Button  Command="{Binding SyncAll}" Width="100" IsEnabled="False">Sync All</Button>
+                <Button  Command="{Binding Refresh}" Width="100" >Refresh</Button>
+            </StackPanel> 
+            <Label Grid.Row="1" Grid.Column="0" Content="Work log message:" />
+            <DatePicker Grid.Row="1" Grid.Column="1" Text="{Binding StartDate,Mode=TwoWay}"
+                     MinWidth="250" />
+        </Grid>
+        <ListView Grid.Row="1" Margin="10 0 10 10" SelectedItem="{Binding SelectedItem}"
+                  ItemsSource="{Binding Source}">
+
+            <ListView.Style>
+                <Style TargetType="{x:Type ListView}">
+                    <Style.Triggers>
+                        <DataTrigger Value="{x:Null}"
+                                     Binding="{Binding DataContext, RelativeSource={RelativeSource Self}}">
+                            <Setter Property="Template" Value="{StaticResource EmptyListBoxTemplate}" />
+                        </DataTrigger>
+                        <DataTrigger Value="0"
+                                     Binding="{Binding DataContext.Count, RelativeSource={RelativeSource Self}}">
+                            <Setter Property="Template" Value="{StaticResource EmptyListBoxTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Style>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Description" Width="400">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Hyperlink NavigateUri="{Binding Path=JiraUrl}"
+                                               Command="{Binding RequestNavigateCommand}">
+                                        <TextBlock Text="{Binding Plat}" />
+                                    </Hyperlink>
+                                    <TextBlock Text="{Binding Path=Comment}" TextTrimming="CharacterEllipsis" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Jira Time" Width="70" DisplayMemberBinding="{Binding TotalJira}" />
+                    <GridViewColumn Header="Toggl Time" Width="70" DisplayMemberBinding="{Binding TotalToggl}" />
+                    <GridViewColumn Header="Diff Time" Width="70" DisplayMemberBinding="{Binding Diff}" />
+                    <GridViewColumn Header="Log as work" Width="70">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Height="28">
+                                <Button Width="24" Height="24" HorizontalAlignment="Center"
+                                        Command="{Binding SyncItemCommand}"
+                                        Visibility="{Binding IsSyncVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Image Source="sync.png" />
+                                    </Button>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Log as Testing" Width="70">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Height="28">
+                                    <Button Width="24" Height="24" HorizontalAlignment="Center"
+                                        Command="{Binding SyncTestingItemCommand}"
+                                        Visibility="{Binding IsSyncVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Image Source="sync.png" />
+                                    </Button>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="New Jira Time" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Height="28">
+                                    <TextBox Text="{Binding Path=NewJiraTime}" Width="60"/>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StatusBar Height="25" Grid.Row="2">
+            <StatusBarItem Content="{Binding State}" />
+        </StatusBar>
+    </Grid>
+</Window>
